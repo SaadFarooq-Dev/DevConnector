@@ -6,7 +6,6 @@ const UserModel = require('../../models/User.model');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const { check, validationResult } = require('express-validator');
-const {ClientSession} = require('mongoose');
 
 // @route     POST api/users
 // @desc      Register Route
