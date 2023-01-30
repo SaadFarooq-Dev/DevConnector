@@ -24,6 +24,46 @@ router.get('/me', auth, async (req, res) => {
  }
 });
 
+// @route     GET api/profile
+// @desc      GET all profiles
+// @access    public
+
+router.get('/', async (req, res) => {
+ try {
+  const profiles = await ProfileModel.find().populate('user', [
+   'name',
+   'avatar',
+  ]);
+  res.json(profiles);
+ } catch (error) {
+  console.error(error.message);
+  res.status(500).send('Server Error');
+ }
+});
+
+// @route     GET api/profile/user/:id
+// @desc      GET profile by user id
+// @access    public
+
+router.get('/user/:id', async (req, res) => {
+ try {
+  const profile = await ProfileModel.findOne({ user: req.params.id }).populate(
+   'user',
+   ['name', 'avatar']
+  );
+  if (!profile) {
+   return res.status(400).json({ msg: 'User Profile Not Found' });
+  }
+  res.json(profile);
+ } catch (error) {
+  console.error(error.message);
+  if (error.kind === 'ObjectId') {
+   return res.status(400).json({ msg: 'User Profile Not Found' });
+  }
+  res.status(500).send('Server Error');
+ }
+});
+
 // @route     POST api/profile
 // @desc      Create or update a user profile
 // @access    private
@@ -100,45 +140,49 @@ router.post(
  }
 );
 
-// @route     GET api/profile
-// @desc      GET all profiles
-// @access    public
+// @route     PUT api/profile/experiene
+// @desc      Add profile experience
+// @access    private
 
-router.get('/', async (req, res) => {
- try {
-  const profiles = await ProfileModel.find().populate('user', [
-   'name',
-   'avatar',
-  ]);
-  res.json(profiles);
- } catch (error) {
-  console.error(error.message);
-  res.status(500).send('Server Error');
- }
-});
-
-// @route     GET api/profile/user/:id
-// @desc      GET profile by user id
-// @access    public
-
-router.get('/user/:id', async (req, res) => {
- try {
-  const profile = await ProfileModel.findOne({ user: req.params.id }).populate(
-   'user',
-   ['name', 'avatar']
-  );
-  if (!profile) {
-   return res.status(400).json({ msg: 'User Profile Not Found' });
+router.put(
+ '/experience',
+ [
+  auth,
+  [
+   check('title', 'Title is required').not().isEmpty(),
+   check('company', 'Company is required').not().isEmpty(),
+   check('from', 'From date is required').not().isEmpty(),
+  ],
+ ],
+ async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+   return res.status(400).json({ errors: errors.array() });
   }
-  res.json(profile);
- } catch (error) {
-  console.error(error.message);
-  if (error.kind === 'ObjectId') {
-   return res.status(400).json({ msg: 'User Profile Not Found' });
+
+  const { title, company, location, from, to, current, description } = req.body;
+
+  const newExperience = {
+   title: title,
+   company: company,
+   location: location,
+   from: from,
+   to: to,
+   current: current,
+   description: description,
+  };
+
+  try {
+   const profile = await ProfileModel.findOne({ user: req.user.id });
+   profile.experience.unshift(newExperience);
+   await profile.save();
+   res.json(profile);
+  } catch (error) {
+   console.error(error.message);
+   res.status(500).send('Server Error');
   }
-  res.status(500).send('Server Error');
  }
-});
+);
 
 // @route     DELETE api/profile
 // @desc      DELETE profile, user & posts
