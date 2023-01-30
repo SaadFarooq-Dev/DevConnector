@@ -184,6 +184,52 @@ router.put(
  }
 );
 
+// @route     PUT api/profile/education
+// @desc      Add profile education
+// @access    private
+
+router.put(
+ '/education',
+ [
+  auth,
+  [
+   check('school', 'School is required').not().isEmpty(),
+   check('degree', 'Degree is required').not().isEmpty(),
+   check('fieldofstudy', 'Field of study is required').not().isEmpty(),
+   check('from', 'From date is required').not().isEmpty(),
+  ],
+ ],
+ async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+   return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { school, degree, fieldofstudy, from, to, current, description } =
+   req.body;
+
+  const newEducation = {
+   school: school,
+   degree: degree,
+   fieldofstudy: fieldofstudy,
+   from: from,
+   to: to,
+   current: current,
+   description: description,
+  };
+
+  try {
+   const profile = await ProfileModel.findOne({ user: req.user.id });
+   profile.education.unshift(newEducation);
+   await profile.save();
+   res.json(profile);
+  } catch (error) {
+   console.error(error.message);
+   res.status(500).send('Server Error');
+  }
+ }
+);
+
 // @route     DELETE api/profile
 // @desc      DELETE profile, user & posts
 // @access    private
@@ -202,6 +248,70 @@ router.delete('/', auth, async (req, res) => {
   res.json({ msg: 'Profile/User deleted', user: user, profile: profile });
  } catch (error) {
   console.error(error.message);
+  res.status(500).send('Server Error');
+ }
+});
+
+// @route     DELETE api/profile/experiene/:id
+// @desc      DELETE profile experience
+// @access    private
+
+router.delete('/experience/:id', auth, async (req, res) => {
+ try {
+  const profile = await ProfileModel.findOneAndUpdate(
+   { user: req.user.id, 'experience._id': req.params.id },
+   {
+    $pull: {
+     experience: { _id: req.params.id },
+    },
+   },
+   { new: true }
+  );
+  if (!profile) {
+   return res
+    .status(400)
+    .json({ msg: 'There is no such experience in user profile' });
+  }
+  res.json(profile);
+ } catch (error) {
+  console.error(error.message);
+  if (error.kind === 'ObjectId') {
+   return res
+    .status(400)
+    .json({ msg: 'There is no such experience in user profile' });
+  }
+  res.status(500).send('Server Error');
+ }
+});
+
+// @route     DELETE api/profile/education/:id
+// @desc      DELETE profile education
+// @access    private
+
+router.delete('/education/:id', auth, async (req, res) => {
+ try {
+  const profile = await ProfileModel.findOneAndUpdate(
+   { user: req.user.id, 'education._id': req.params.id },
+   {
+    $pull: {
+     education: { _id: req.params.id },
+    },
+   },
+   { new: true }
+  );
+  if (!profile) {
+   return res
+    .status(400)
+    .json({ msg: 'There is no such education in user profile' });
+  }
+  res.json(profile);
+ } catch (error) {
+  console.error(error.message);
+  if (error.kind === 'ObjectId') {
+   return res
+    .status(400)
+    .json({ msg: 'There is no such education in user profile' });
+  }
   res.status(500).send('Server Error');
  }
 });
