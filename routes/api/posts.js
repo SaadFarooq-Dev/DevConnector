@@ -69,6 +69,65 @@ router.post(
  }
 );
 
+// @route     PUT api/posts/like/:id
+// @desc      Create a post Like relationship
+// @access    Private
+
+router.put('/like/:id', auth, async (req, res) => {
+ try {
+  const post = await PostModel.findById(req.params.id);
+
+  if (
+   post.likes.filter((like) => like.user.toString() === req.user.id).length > 0
+  ) {
+   return res.status(400).json({ msg: 'Post already Liked' });
+  }
+  post.likes.unshift({ user: req.user.id });
+  await post.save();
+  res.json(post.likes);
+ } catch (error) {
+  console.error(error.message);
+  if (error.kind === 'ObjectId') {
+   return res.status(404).json({ msg: 'There is no such post' });
+  }
+  res.status(500).send('Server Error: ' + error.message);
+ }
+});
+
+// @route     PUT api/posts/unlike/:id
+// @desc      Remove a post Like relationship
+// @access    Private
+
+router.put('/unlike/:id', auth, async (req, res) => {
+ try {
+  const post = await PostModel.findById(req.params.id);
+
+  if (
+   post.likes.filter((like) => like.user.toString() === req.user.id).length ===
+   0
+  ) {
+   return res.status(400).json({ msg: 'Post has not yet been Liked' });
+  }
+
+  await PostModel.findOneAndUpdate(
+   { user: req.user.id, _id: req.params.id, 'likes.user': req.user.id },
+   {
+    $pull: {
+     likes: { user: req.user.id },
+    },
+   }
+  );
+
+  res.json({ msg: 'Post Unliked' });
+ } catch (error) {
+  console.error(error.message);
+  if (error.kind === 'ObjectId') {
+   return res.status(404).json({ msg: 'There is no such post' });
+  }
+  res.status(500).send('Server Error: ' + error.message);
+ }
+});
+
 // @route     DELETE api/posts/:id
 // @desc      DELETE user post
 // @access    private
