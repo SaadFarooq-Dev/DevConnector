@@ -54,13 +54,13 @@ router.get('/user/:id', async (req, res) => {
    ['name', 'avatar']
   );
   if (!profile) {
-   return res.status(400).json({ msg: 'User Profile Not Found' });
+   return res.status(404).json({ msg: 'User Profile Not Found' });
   }
   res.json(profile);
  } catch (error) {
   console.error(error.message);
   if (error.kind === 'ObjectId') {
-   return res.status(400).json({ msg: 'User Profile Not Found' });
+   return res.status(404).json({ msg: 'User Profile Not Found' });
   }
   res.status(500).send('Server Error');
  }
@@ -278,7 +278,7 @@ router.delete('/', auth, async (req, res) => {
   const user = await UserModel.findOneAndRemove({ _id: req.user.id });
 
   if (!(profile && user)) {
-   return res.status(400).json({ msg: 'Invalid Request' });
+   return res.status(404).json({ msg: 'Invalid Request' });
   }
   res.json({ msg: 'Profile/User deleted', user: user, profile: profile });
  } catch (error) {
@@ -304,7 +304,7 @@ router.delete('/experience/:id', auth, async (req, res) => {
   );
   if (!profile) {
    return res
-    .status(400)
+    .status(404)
     .json({ msg: 'There is no such experience in user profile' });
   }
   res.json(profile);
@@ -312,7 +312,7 @@ router.delete('/experience/:id', auth, async (req, res) => {
   console.error(error.message);
   if (error.kind === 'ObjectId') {
    return res
-    .status(400)
+    .status(404)
     .json({ msg: 'There is no such experience in user profile' });
   }
   res.status(500).send('Server Error');
@@ -336,7 +336,7 @@ router.delete('/education/:id', auth, async (req, res) => {
   );
   if (!profile) {
    return res
-    .status(400)
+    .status(404)
     .json({ msg: 'There is no such education in user profile' });
   }
   res.json(profile);
@@ -344,7 +344,7 @@ router.delete('/education/:id', auth, async (req, res) => {
   console.error(error.message);
   if (error.kind === 'ObjectId') {
    return res
-    .status(400)
+    .status(404)
     .json({ msg: 'There is no such education in user profile' });
   }
   res.status(500).send('Server Error');
