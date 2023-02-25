@@ -1,4 +1,5 @@
-import React from 'react';
+// import React from 'react';
+import { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -8,18 +9,27 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
-import { Link } from 'react-router-dom';
+import Drawer from '@mui/material/Drawer';
+import List from '@mui/material/List';
+import Divider from '@mui/material/Divider';
+import ListItem from '@mui/material/ListItem';
+import ListItemButton from '@mui/material/ListItemButton';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import InboxIcon from '@mui/icons-material/MoveToInbox';
+import MailIcon from '@mui/icons-material/Mail';
+import SearchBar from '../search-bar/SearchBar';
 
 const pages = ['Home', 'Find Devs', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const drawerWidth = 240;
+
 
 function NavBar() {
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
-  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [anchorElNav, setAnchorElNav] = useState(null);
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -38,11 +48,25 @@ function NavBar() {
 
   return (
     <header>
-
-      <AppBar position="sticky" component="header" sx={{ height: '8vh' }}>
+      <AppBar position="sticky" component="header" sx={{ height: '8vh',zIndex: (theme) => theme.zIndex.drawer + 1 }}  color="transparent">
         <Container maxWidth="false">
           <Toolbar disableGutters>
-            <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <Typography
+              noWrap
+              component="a"
+              href="/"
+              sx={{
+                mr: 2,
+                display: { xs: 'none', md: 'flex' },
+                fontFamily: 'sans-serif',
+                fontWeight: 1000,
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+            >
+            <img src='images/logov1.png' alt="Logo" width="50" height='50'/>
+            </Typography>
+
             <Typography
               variant="h6"
               noWrap
@@ -51,16 +75,14 @@ function NavBar() {
               sx={{
                 mr: 2,
                 display: { xs: 'none', md: 'flex' },
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                letterSpacing: '.3rem',
+                fontFamily: 'sans-serif',
+                fontWeight: 1000,
                 color: 'inherit',
                 textDecoration: 'none',
               }}
             >
-              LOGO
+              MeetDev
             </Typography>
-
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
               <IconButton
                 size="large"
@@ -97,7 +119,9 @@ function NavBar() {
                 ))}
               </Menu>
             </Box>
-            <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+            <Typography sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }}>
+            <img src='images/logov1.png' alt="Logo" width="40" height='40'/>
+            </Typography>
             <Typography
               variant="h5"
               noWrap
@@ -106,28 +130,35 @@ function NavBar() {
               sx={{
                 mr: 2,
                 display: { xs: 'flex', md: 'none' },
+                fontFamily: 'sans-serif',
+                fontWeight: 1000,
+                color: 'inherit',
+                textDecoration: 'none',
                 flexGrow: 1,
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                letterSpacing: '.3rem',
+              }}
+            >
+              MeetDev
+            </Typography>
+            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' },ml:7 }} >
+            <SearchBar/>
+            </Box>
+            <Typography
+              variant="h5"
+              noWrap
+              component="a"
+              href=""
+              sx={{
+                mr: 2,
+                fontSize:20,
+                display: { xs: 'none', md: 'flex' },
+                fontFamily: 'sans-serif',
+                fontWeight: 1000,
                 color: 'inherit',
                 textDecoration: 'none',
               }}
             >
-              LOGO
+              Jhon Doe
             </Typography>
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
-                <Link to={`./home`} style={{ textDecoration: 'none' }}>     <Button
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                  {page}
-                </Button></Link>
-              ))}
-            </Box>
-
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title="Open settings">
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -160,6 +191,44 @@ function NavBar() {
           </Toolbar>
         </Container>
       </AppBar>
+      <Drawer
+        variant="permanent"
+        sx={{
+          width: drawerWidth,
+          flexShrink: 0,
+          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: 'border-box',border:'none' },
+          display: { xs: 'none', md: 'flex' },
+        }}
+      >
+        <Toolbar />
+        <Box sx={{ overflow: 'auto' }}>
+          <List sx={{mt:2}}>
+            {pages.map((text, index) => (
+              <ListItem key={text} disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+          <List>
+            {settings.map((text, index) => (
+              <ListItem key={text} disablePadding>
+                <ListItemButton>
+                  <ListItemIcon>
+                    {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItemButton>
+              </ListItem>
+            ))}
+          </List>
+        </Box>
+      </Drawer>
     </header>
   );
 }
