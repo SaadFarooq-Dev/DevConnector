@@ -1,4 +1,3 @@
-import React from 'react';
 import NavBar from './components/layout/navBar';
 import AppRoutes from './routes/appRoutes';
 import '@fontsource/roboto/300.css';
@@ -12,7 +11,7 @@ const App = () => {
   return (
     <div className='App'>
       <NavBar/>
-        <AppRoutes/>
+      <AppRoutes/>
     </div>
   );
 }

@@ -6,13 +6,20 @@ import { createTheme } from '@mui/material/styles';
 const Theme = createTheme({
   palette: {
     primary: {
-      main: '#1e88e5',
+      main: '#0d47a1',
     },
     secondary: {
       main: '#19857b',
     },
     error: {
       main: red.A400,
+    },
+  },
+  typography: {
+    allVariants: {
+      fontFamily: 'sans-serif',
+      fontWeight:500,
+      color:'#4e4f4e',
     },
   },
 });
